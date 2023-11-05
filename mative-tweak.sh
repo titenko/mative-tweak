@@ -836,7 +836,7 @@ echo " Your kernel release: $KERNEL_RELEASE"
 echo " Your kernel version: $KERNEL_VERSION"
 echo ""
 echo " mative-tweak v$SCRIPT_VERSION (c) Maksym Titenko" 
-echo " https://github.com/titenko "
+echo " https://github.com/titenko/mative-tweak"
 echo ""                                                                                                                    
     # Display the menu
     echo " Menu:"
