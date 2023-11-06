@@ -921,7 +921,7 @@ echo ""
         20) option20 ;;
         21) option21 ;;
         22) option22 ;;
-        u)  update_script ;;
+        u)  update_and_restart_script ;;
         a)  option00 ;;
         e)  echo "Exiting the program."
             exit 0
