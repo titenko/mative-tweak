@@ -10,14 +10,15 @@ prompt="$user@$hostname:~#"
 # URL to the new version on GitHub
 GITHUB_URL="https://raw.githubusercontent.com/titenko/mative-tweak/master/mative-tweak.sh"
 
-# Function for updating the script
-update_script() {
+# Function for updating and restarting the script
+update_and_restart_script() {
   echo "Updating the script..."
   if curl -s "$GITHUB_URL" -o "$0.tmp"; then
     mv "$0.tmp" "$0"
     chmod +x "$0"
-    echo "Script updated successfully."
+    echo "Script updated successfully. Restarting..."
     sleep 2
+    exec "$0" "$@"  # Restart the script
   else
     echo "Failed to update the script."
   fi
@@ -25,10 +26,9 @@ update_script() {
 
 # Check version and update
 if [ "$1" = "--update" ]; then
-  update_script
+  update_and_restart_script "$@"
   exit 0
 fi
-
 
 function option0 {
     while true; do
