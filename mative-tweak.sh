@@ -17,6 +17,7 @@ update_script() {
     mv "$0.tmp" "$0"
     chmod +x "$0"
     echo "Script updated successfully."
+    sleep 2
   else
     echo "Failed to update the script."
   fi
