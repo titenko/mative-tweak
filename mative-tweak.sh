@@ -7,6 +7,28 @@ user=$(whoami)
 hostname=$(hostname)
 prompt="$user@$hostname:~#"
 
+# URL to the new version on GitHub
+GITHUB_URL="https://raw.githubusercontent.com/titenko/mative-tweak/master/mative-tweak.sh"
+
+# Function for updating the script
+update_script() {
+  echo "Updating the script..."
+  if curl -s "$GITHUB_URL" -o "$0.tmp"; then
+    mv "$0.tmp" "$0"
+    chmod +x "$0"
+    echo "Script updated successfully."
+  else
+    echo "Failed to update the script."
+  fi
+}
+
+# Check version and update
+if [ "$1" = "--update" ]; then
+  update_script
+  exit 0
+fi
+
+
 function option0 {
     while true; do
         clear  # Clear the screen
@@ -808,6 +830,8 @@ function option00 {
         echo "mative-tweak script for system customization and optimization,"
         echo "installation of additional software from third-party repositories."
         echo "The purpose of this script is to save the user from routine tasks after reinstalling the system."
+        echo ""
+        echo "Issue: https://github.com/titenko/mative-tweak/issues"
         # Prompt the user to return to the menu
         echo ""        
         read -p "Press 'q' to return to the menu: " input
@@ -862,7 +886,8 @@ echo ""
     echo " 19. Foliate - Installing and configuring"
     echo " 20. Zram - Installing and configuring"
     echo " 21. Papirus Icons Pack - download and install"
-    echo " a.  About"    
+    echo " a.  About"
+    echo " u.  Check update"    
     echo " e.  Exit"
 
     # Prompt the user to make a choice
@@ -895,6 +920,7 @@ echo ""
         20) option20 ;;
         21) option21 ;;
         22) option22 ;;
+        u)  update_script ;;
         a)  option00 ;;
         e)  echo "Exiting the program."
             exit 0
@@ -903,4 +929,3 @@ echo ""
             ;;
     esac
 done
-
