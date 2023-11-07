@@ -4,6 +4,12 @@
 
 mative-tweak script for configuring and optimizing Ubuntu/Debian and their derivatives, installing additional software from third-party repositories. The purpose of this script is to save the user from routine tasks after reinstalling the system.
 
+## Install
+
+    wget https://raw.githubusercontent.com/titenko/mative-tweak/master/mative-tweak.sh &&
+    chmod +x mative-tweak.sh
+
+
 ![mative-tweak](https://raw.githubusercontent.com/titenko/mative-tweak/master/screenshot/mative-tweak.png)
 
 ## Features
