@@ -104,8 +104,9 @@ Support for other browsers will be added in the future.
 
 ## Roadmap
 
- - [ ]  Structure the script, organize functions and add sections.
+ - [x]  Structure the script, organize functions and add sections.
         (Priority)
+     - [ ] --> Add menus and sections       
  - [ ]  Make cosmetic changes to improve the appearance and simplify
         interactions with the script.
  - [ ]  Organize the code, add comments and change function names for
