@@ -10,7 +10,7 @@ mative-tweak script for configuring and optimizing Ubuntu/Debian and their deriv
     chmod +x mative-tweak.sh
 
 
-![mative-tweak](https://raw.githubusercontent.com/titenko/mative-tweak/master/screenshot/mative-tweak-1.png)
+![mative-tweak](https://raw.githubusercontent.com/titenko/mative-tweak/master/screenshot/mative-tweak.png)
 
 ## Features
 
