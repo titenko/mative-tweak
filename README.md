@@ -104,23 +104,23 @@ Support for other browsers will be added in the future.
 
 ## Roadmap
 
- - [ ] Structure the script, organize functions and add sections.
-       (Priority)
- - [ ] Make cosmetic changes to improve the appearance and simplify
-       interactions with the script.
- - [ ] Organize the code, add comments and change function names for
-       better script readability and easier editing.
- - [ ] Optimize the operation of the Xanmod kernel installer, identify
-       and eliminate errors.
- - [ ] Add a function to update the standard kernel from the Mainline
-       branch
+ - [ ]  Structure the script, organize functions and add sections.
+        (Priority)
+ - [ ]  Make cosmetic changes to improve the appearance and simplify
+        interactions with the script.
+ - [ ]  Organize the code, add comments and change function names for
+        better script readability and easier editing.
+ - [ ]  Optimize the operation of the Xanmod kernel installer, identify
+        and eliminate errors.
+ - [ ]  Add a function to update the standard kernel from the Mainline
+        branch
 
 **Expand the functionality of the script:**
 
- - [ ] Add additional settings and system tweaks
+ - [ ]  Add additional settings and system tweaks
 
- - [ ] Expand the list of browsers
+ - [ ]  Expand the list of browsers
 
- - [ ] Expand the list of applications
+ - [ ]  Expand the list of applications
 
- - [ ] Expand the list of themes and icons
+ - [ ]  Expand the list of themes and icons
