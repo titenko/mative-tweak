@@ -1122,7 +1122,7 @@ while true; do
     echo " 8.  Automatically installing Nvidia drivers - Version 2"
     echo " 9.  Automatically installing Nouveau Nvidia drivers"
     echo " --- Browsers"
-    echo " 10.  Firefox - Install the deb version of the web browser from PPA"
+    echo " 10. Firefox - Install the deb version of the web browser from PPA"
     echo " 11. Brave - Install the deb version of the web browser from official repository"
     echo " 12. Chromium - Install the deb version of the web browser from PPA"
     echo " 13. Google Chrome - Install the deb version of the web browser from official Google repository"
