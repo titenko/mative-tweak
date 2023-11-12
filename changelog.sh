@@ -24,7 +24,7 @@ while true; do
     if [ -z "$line" ]; then
         break
     fi
-    changes+="$line\n    "
+    changes+="- $line\n    "
 done
 
 echo ""

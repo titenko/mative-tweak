@@ -1043,6 +1043,26 @@ function about {
     done
 }
 
+function changelog {
+    while true; do
+        clear # Clear the screen
+
+        echo "Changelog:"
+        echo ""
+        # Download the file from the URL and use 'cat' to display its contents
+        curl -sS https://raw.githubusercontent.com/titenko/mative-tweak/master/CHANGELOG.md | cat
+        echo ""
+        # Prompt the user to return to the menu
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
+
+        if [ "$input" == "q" ]; then
+            rm -f CHANGELOG.md # Remove the file CHANGELOG.md
+            break # Exit the loop and return to the menu
+        fi
+    done
+}
+
 function reboot {
     while true; do
         clear # Clear the screen
@@ -1123,6 +1143,7 @@ while true; do
     echo " 24. Papirus Icons Pack - download and install"
     echo " --- "
     echo " a.  About"
+    echo " c.  Changelog"
     echo " u.  Check update"
     echo " r.  Reboot mative-tweak"
     echo " e.  Exit"
@@ -1170,6 +1191,7 @@ while true; do
     # ---
     u) update_and_restart_script ;;
     a) about ;;
+    c) changelog ;;
     r) reboot ;;
     e)
         echo "Exiting the program."
