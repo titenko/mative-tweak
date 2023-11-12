@@ -43,7 +43,8 @@ function update_and_upgrade {
         echo "System upgrade - completed"
         echo ""
         # Prompt the user to return to the menu
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -86,7 +87,8 @@ function unsnap {
         fi
         echo ""
         # Prompt the user to return to the menu
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -131,7 +133,8 @@ function flatpak_installer {
         echo "Flatpak is installed and configured with maximum system integration."
 
         # Prompt the user to return to the menu
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -186,7 +189,8 @@ function firefox_unsnap {
         fi
         echo ""
         # Prompt the user to return to the menu
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -207,7 +211,8 @@ function brave_installer {
         sudo apt install brave-browser -y
         echo ""
         # Prompt the user to return to the menu
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -230,7 +235,8 @@ __EOF__
         sudo apt install chromium-browser -y
         echo ""
         # Prompt the user to return to the menu
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -278,7 +284,8 @@ function google_chrome_installer {
         echo "Google Chrome is installed and ready to use."
         echo ""
         # Prompt the user to return to the menu
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -294,7 +301,8 @@ function multimedia_codec {
 
         sudo apt install ubuntu-restricted-extras libavcodec-extra libdvd-pkg -y
         # Prompt the user to return to the menu
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -310,7 +318,8 @@ function additional_archivers {
 
         sudo apt install p7zip-rar rar unrar unace arj cabextract -y
         # Prompt the user to return to the menu
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -335,7 +344,8 @@ function nvidia_installer_v1 {
         # Automatic video driver installation
         sudo ubuntu-drivers autoinstall -y
         # Prompt the user to return to the menu
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -371,7 +381,58 @@ function nvidia_installer_v2 {
             sudo apt install nvidia-driver-390 -y
         fi
         # Prompt the user to return to the menu
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
+
+        if [ "$input" == "q" ]; then
+            break # Exit the loop and return to the menu
+        fi
+    done
+}
+
+function nouveau_installer {
+    while true; do
+        clear # Clear the screen
+
+        echo "Automatically installing Nouveau Nvidia drivers"
+
+        # Checks if the script is run with superuser privileges
+        check_root() {
+            if [ "$EUID" -ne 0 ]; then
+                echo "This script must be run with superuser privileges. Please enter the password to continue."
+                sudo "$0" "$@" # Re-run the script with superuser privileges
+                exit $?
+            fi
+        }
+
+        # Removes proprietary drivers and their dependencies
+        remove_proprietary_drivers() {
+            ubuntu-drivers autoinstall --remove
+        }
+
+        # Installs the Nouveau driver
+        install_nouveau() {
+            # Update the package list
+            apt update
+
+            # Install the Nouveau driver package
+            apt install xserver-xorg-video-nouveau
+
+            # Reboot the system to apply the changes
+            echo "Nouveau installation completed. Please reboot the system to apply the changes."
+        }
+
+        # Checks for the presence of installed proprietary NVIDIA drivers
+        check_root
+        if ubuntu-drivers list | grep -q "nvidia"; then
+            remove_proprietary_drivers
+        fi
+
+        echo "Installing Nouveau."
+        install_nouveau
+        # Prompt the user to return to the menu
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -388,7 +449,8 @@ function telegram_installer {
         sudo ln -s /opt/Telegram/Telegram /usr/local/bin/telegram-desktop
         /opt/Telegram/Telegram -- %u
         # Prompt the user to return to the menu
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -448,7 +510,8 @@ function ferdium_installer {
         echo "Installation of the latest Ferdium version ($latest_version) is complete."
         echo ""
         # Prompt the user to return to the menu
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -493,7 +556,8 @@ function discord_installer {
         echo "Discord installation completed."
         echo ""
         # Prompt the user to return to the menu
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -558,7 +622,8 @@ function xanmod_installer {
 
         # Prompt the user to return to the menu
         echo ""
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -585,7 +650,8 @@ function liquorix_installer_ppa {
         echo "Liquorix kernel installation is complete. Please reboot your system to use the new kernel."
         echo ""
         # Prompt the user to return to the menu
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -604,12 +670,177 @@ function liquorix_installer_scr {
         echo "Liquorix kernel installation is complete. Please reboot your system to use the new kernel."
         echo ""
         # Prompt the user to return to the menu
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
         fi
     done
+}
+
+function ubuntu_mainline_kernel_ppa {
+    while true; do
+        clear
+        echo ""
+        echo " Ubuntu Mainline Kernel Installer from PPA"
+        echo ""
+        while true; do
+            echo " Are you sure you want to continue?"
+            echo " 1. Yes"
+            echo " 2. No"
+            echo ""
+            echo "Select an option: Enter 1 for Yes or 2 for No: "
+            read -p "$prompt " input
+            case "$input" in
+            1) #Yes
+                echo "Start."
+                sleep 2
+                # Add the PPA
+                sudo add-apt-repository -y ppa:cappelikan/ppa
+                sudo apt-get update
+
+                # Install the latest kernel version from the PPA
+                sudo apt-get install -y mainline
+
+                # Select the latest kernel version
+                latest_kernel=$(ls /lib/modules | grep -oP '\d+\.\d+\.\d+' | sort -V | tail -n1)
+
+                echo "Installed kernel version $latest_kernel."
+
+                # Reboot the system
+                echo "Reboot your system to activate the new kernel."
+
+                ;;
+            2) #No
+                echo "Stop."
+                sleep 2
+                outer_break=true
+                break # Exit the inner loop
+                ;;
+            *)
+                echo "Incorrect option. Please select again."
+                sleep 2
+                break
+                ;;
+            esac
+            echo ""
+            echo "Press 'q' to return to the menu:"
+            read -p "$prompt " input
+            if [ "$input" == "q" ]; then
+                outer_break=true
+                break
+            fi
+        done
+
+        if [ "$outer_break" == true ]; then
+            break # Exit the outer loop
+        fi
+    done
+
+}
+
+function ubuntu_mainline_kernel_src {
+    while true; do
+        clear
+        echo ""
+        echo " Ubuntu Mainline Kernel Installer from SRC (Testing)"
+        echo ""
+        while true; do
+            echo " Are you sure you want to continue?"
+            echo " 1. Yes"
+            echo " 2. No"
+            echo ""
+            echo "Select an option: Enter 1 for Yes or 2 for No: "
+            read -p "$prompt " input
+            case "$input" in
+            1) #Yes
+                echo "Start installing Ubuntu Mainline Kernel."
+                sleep 2
+                # URL for the directory with deb files
+                base_url="https://kernel.ubuntu.com/mainline/"
+                latest_version=$(curl -s https://kernel.ubuntu.com/mainline/ | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+(-[0-9]+)?' | sort -V | tail -n 1)
+                version=$(curl -s $base_url | grep -oP 'v\d+\.\d+\.\d+' | head -1)
+                url="${base_url}${latest_version}/amd64/"
+
+                # Create a folder in the home directory
+                target_folder=~/mainline/${latest_version}/amd64
+                mkdir -p $target_folder
+
+                # Get a list of deb files in the directory
+                files=$(curl -s $url | grep -Eo 'href="[^"]*\.deb"' | sed 's/href="//;s/"//')
+
+                # Download each deb file to the folder
+                for file in $files; do
+                    wget -P $target_folder "${url}${file}"
+                done
+
+                # Print information about the version and request installation confirmation
+                echo "You are about to install the kernel version ${latest_version}."
+
+                while true; do
+                    read -p "Do you want to continue? (y/n): " answer
+                    case $answer in
+                    [Yy]*)
+                        # Notification of the start of installation
+                        echo "Starting the installation of files..."
+
+                        # Install all deb files
+                        cd $target_folder
+                        sudo dpkg -i *.deb
+
+                        # Check dependencies and installation success
+                        if [ $? -eq 0 ]; then
+                            echo "Files installed successfully."
+                            echo "Removing the mainline folder and its contents."
+
+                            # Attempt to install dependencies
+                            sudo apt install -f
+
+                            # Remove the mainline folder and all its contents
+                            rm -rf ~/mainline
+                        else
+                            echo "Installation error. Check dependencies."
+                        fi
+                        break
+                        ;;
+                    [Nn]*)
+                        echo "Installation canceled. Removing the mainline folder and its contents."
+                        rm -rf ~/mainline
+                        break
+                        ;;
+                    *)
+                        echo "Please enter 'yes' or 'no'."
+                        ;;
+                    esac
+                done
+                ;;
+            2) #No
+                echo "Stop."
+                sleep 2
+                outer_break=true
+                break # Exit the inner loop
+                ;;
+            *)
+                echo "Incorrect option. Please select again."
+                sleep 2
+                break
+                ;;
+            esac
+            echo ""
+            echo "Press 'q' to return to the menu:"
+            read -p "$prompt " input
+            if [ "$input" == "q" ]; then
+                outer_break=true
+                break
+            fi
+        done
+
+        if [ "$outer_break" == true ]; then
+            break # Exit the outer loop
+        fi
+    done
+
 }
 
 function disable_sudo_passwd {
@@ -620,7 +851,8 @@ function disable_sudo_passwd {
 
         sudo bash -c 'echo "$(logname) ALL=(ALL:ALL) NOPASSWD: ALL" | (EDITOR="tee -a" visudo)'
         # Prompt the user to return to the menu
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -655,7 +887,8 @@ function vlc_installer {
 
         echo ""
         # Prompt the user to return to the menu
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -701,7 +934,8 @@ function foliate_installer {
         echo "Foliate has been successfully installed and configured to open supported file formats!"
         echo ""
         # Prompt the user to return to the menu
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -743,7 +977,8 @@ function zram_installer {
         fi
         echo ""
         # Prompt the user to return to the menu
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -760,7 +995,8 @@ function papirus_installer {
         wget -qO- https://git.io/papirus-icon-theme-install | sh
         echo ""
         # Prompt the user to return to the menu
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -775,7 +1011,8 @@ function option22 {
         echo "You chose option 22"
 
         # Prompt the user to return to the menu
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -797,7 +1034,8 @@ function about {
         echo "Issue: https://github.com/titenko/mative-tweak/issues"
         # Prompt the user to return to the menu
         echo ""
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -816,7 +1054,8 @@ function reboot {
         #./mative-tweak.sh
         # Prompt the user to return to the menu
         echo ""
-        read -p "Press 'q' to return to the menu: " input
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
 
         if [ "$input" == "q" ]; then
             break # Exit the loop and return to the menu
@@ -856,28 +1095,32 @@ while true; do
     echo " 2.  Flatpak installation and configuration"
     echo " 3.  Install the multimedia codec pack"
     echo " 4.  Install additional support for archivers"
-    echo " 5.  Automatically installing Nvidia drivers - Version 1"
-    echo " 6.  Automatically installing Nvidia drivers - Version 2"
-    echo " 7.  Disable sudo password entry in terminal"
-    echo " 8.  Zram - Installing and configuring"
+    echo " 5.  Disable sudo password entry in terminal"
+    echo " 6.  Zram - Installing and configuring"
+    echo " --- Nvidia"
+    echo " 7.  Automatically installing Nvidia drivers - Version 1"
+    echo " 8.  Automatically installing Nvidia drivers - Version 2"
+    echo " 9.  Automatically installing Nouveau Nvidia drivers"
     echo " --- Browsers"
-    echo " 9.  Firefox - Install the deb version of the web browser from PPA"
-    echo " 10. Brave - Install the deb version of the web browser from official repository"
-    echo " 11. Chromium - Install the deb version of the web browser from PPA"
-    echo " 12. Google Chrome - Install the deb version of the web browser from official Google repository"
+    echo " 10.  Firefox - Install the deb version of the web browser from PPA"
+    echo " 11. Brave - Install the deb version of the web browser from official repository"
+    echo " 12. Chromium - Install the deb version of the web browser from PPA"
+    echo " 13. Google Chrome - Install the deb version of the web browser from official Google repository"
     echo " --- Messengers"
-    echo " 13. Telegram Desktop - Install binary version from official web page"
-    echo " 14. Ferdium - Install the deb version from GitHub"
-    echo " 15. Discord - Install the deb version from official web page"
+    echo " 14. Telegram Desktop - Install binary version from official web page"
+    echo " 15. Ferdium - Install the deb version from GitHub"
+    echo " 16. Discord - Install the deb version from official web page"
     echo " --- Kernels"
-    echo " 16. Automatic installation of Xanmod kernel with CPU compatibility level detection"
-    echo " 17. Install Liquorix kernel from PPA"
-    echo " 18. Install Liquorix kernel using the developer script"
+    echo " 17. Automatic installation of Xanmod kernel with CPU compatibility level detection"
+    echo " 18. Install Liquorix kernel from PPA"
+    echo " 19. Install Liquorix kernel using the developer script"
+    echo " 20. Install Ubuntu Mainline Kernel from PPA"
+    echo " 21. Install Ubuntu Mainline Kernel from SRC (Testing)"
     echo " --- Apps"
-    echo " 19. VLC player - Installing and configuring"
-    echo " 20. Foliate - Installing and configuring"
+    echo " 22. VLC player - Installing and configuring"
+    echo " 23. Foliate - Installing and configuring"
     echo " --- Themes & Icons"
-    echo " 21. Papirus Icons Pack - download and install"
+    echo " 24. Papirus Icons Pack - download and install"
     echo " --- "
     echo " a.  About"
     echo " u.  Check update"
@@ -897,29 +1140,33 @@ while true; do
     2) flatpak_installer ;;
     3) multimedia_codec ;;
     4) additional_archivers ;;
-    5) nvidia_installer_v1 ;;
-    6) nvidia_installer_v2 ;;
-    7) disable_sudo_passwd ;;
-    8) zram_installer ;;
+    5) disable_sudo_passwd ;;
+    6) zram_installer ;;
+    # Nvidia
+    7) nvidia_installer_v1 ;;
+    8) nvidia_installer_v2 ;;
+    9) nouveau_installer ;;
     # Browsers
-    9) firefox_unsnap ;;
-    10) brave_installer ;;
-    11) chromium_installer ;;
-    12) google_chrome_installer ;;
+    10) firefox_unsnap ;;
+    11) brave_installer ;;
+    12) chromium_installer ;;
+    13) google_chrome_installer ;;
     # Messengers
-    13) telegram_installer ;;
-    14) ferdium_installer ;;
-    15) discord_installer ;;
+    14) telegram_installer ;;
+    15) ferdium_installer ;;
+    16) discord_installer ;;
     # Kernels
-    16) xanmod_installer ;;
-    17) liquorix_installer_ppa ;;
-    18) liquorix_installer_scr ;;
+    17) xanmod_installer ;;
+    18) liquorix_installer_ppa ;;
+    19) liquorix_installer_scr ;;
+    20) ubuntu_mainline_kernel_ppa ;;
+    21) ubuntu_mainline_kernel_src ;;
     # Apps
-    19) vlc_installer ;;
-    20) foliate_installer ;;
+    22) vlc_installer ;;
+    23) foliate_installer ;;
     # Themes & Icons
-    21) papirus_installer ;;
-    22) option22 ;;
+    24) papirus_installer ;;
+    25) option22 ;;
     # ---
     u) update_and_restart_script ;;
     a) about ;;
