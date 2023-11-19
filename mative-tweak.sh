@@ -6,6 +6,18 @@ KERNEL_VERSION=$(uname -v)
 user=$(whoami)
 hostname=$(hostname)
 prompt="$user@$hostname:~#"
+GREEN='\e[32m' # set the color to green
+NC='\e[0m'     # discolor
+print_logo() {
+    cat << "EOF"
+  ____    ____       _     _________  _____  ____   ____  ________
+ |_   \  /   _|     / \   |  _   _  ||_   _||_  _| |_  _||_   __  |
+   |   \/   |      / _ \  |_/ | | \_|  | |    \ \   / /    | |_ \_|
+   | |\  /| |     / ___ \     | |      | |     \ \ / /     |  _| _
+  _| |_\/_| |_  _/ /   \ \_  _| |_    _| |_     \ ' /     _| |__/ |
+ |_____||_____||____| |____||_____|  |_____|     \_/     |________|
+EOF
+}
 
 # URL to the new version on GitHub
 GITHUB_URL="https://raw.githubusercontent.com/titenko/mative-tweak/master/mative-tweak.sh"
@@ -1058,7 +1070,7 @@ function changelog {
 
         if [ "$input" == "q" ]; then
             rm -f CHANGELOG.md # Remove the file CHANGELOG.md
-            break # Exit the loop and return to the menu
+            break              # Exit the loop and return to the menu
         fi
     done
 }
@@ -1083,23 +1095,307 @@ function reboot {
     done
 }
 
+function mative-fetch {
+    while true; do
+        clear # Clear the screen
+
+        MATIVE_FETCH_VERSION="0.0.1"
+        user=$(whoami)
+        hostname=$(hostname)
+        prompt="$user@$hostname:~#"
+
+        # Clear the screen
+        clear
+
+        # Logo
+        print_logo
+
+        # Application information
+        echo ""
+        echo -e "${GREEN} \e[1mmative-fetch${NC} is a command-line system information tool written in bash."
+        echo " mative-fetch displays information about your operating system,"
+        echo " software and hardware in an aesthetic and visually pleasing way."
+        echo ""
+        echo " mative-fetch v$MATIVE_FETCH_VERSION (c) Maksym Titenko"
+        echo " GitHub: https://github.com/titenko/mative-tweak"
+        echo " Discussions: https://github.com/titenko/mative-tweak/discussions"
+        echo " Issues: https://github.com/titenko/mative-tweak/issues"
+        echo ""
+
+        # Defining a function to obtain information about the system
+        get_system_info() {
+            GREEN='\e[32m' # set the color to green
+            NC='\e[0m'     # discolor
+
+            echo -e "${GREEN} \e[1mSystem Information:${NC}"
+            echo ""
+            echo -e "${GREEN} \e[1m-------------------${NC}"
+            echo -e "${GREEN} \e[1mOS:${NC} $(lsb_release -d | cut -f2-)"
+            echo -e "${GREEN} \e[1mHost:${NC} $(hostname)"
+            echo -e "${GREEN} \e[1mKernel:${NC} $(uname -r)"
+            echo -e "${GREEN} \e[1mUptime:${NC} $(uptime -p)"
+
+            # Counting the number of installed packages using dpkg and flatpak
+            dpkg_packages=$(dpkg -l | grep -c '^ii')
+            flatpak_packages=$(flatpak list --columns=application | tail -n +2 | wc -l)
+            echo -e "${GREEN} \e[1mPackages:${NC} $dpkg_packages (dpkg), $flatpak_packages (flatpak)"
+
+            echo -e "${GREEN} \e[1mShell:${NC} $(echo $SHELL)"
+            echo -e "${GREEN} \e[1mResolution:${NC} $(xrandr --current | grep '*' | uniq | awk '{print $1}')"
+
+            echo -e "${GREEN} \e[1m-------------------${NC}"
+            echo -e "${GREEN} \e[1mDesktop Environment Information:${NC}"
+            desktop_environment=$(echo $XDG_CURRENT_DESKTOP)
+
+            case "$desktop_environment" in
+            "GNOME")
+                gnome_version=$(gnome-session --version)
+                desktop_environment_version=$(echo "$gnome_version" | awk '{print $2}')
+                ;;
+            "KDE" | "KDE Plasma")
+                kde_version=$(kdeinit5 --version)
+                desktop_environment_version=$(echo "$kde_version" | awk '{print $3}')
+                ;;
+            "X-Cinnamon")
+                cinnamon_version=$(cinnamon --version)
+                desktop_environment_version=$(echo "$cinnamon_version" | awk '{print $2}')
+                desktop_environment="Cinnamon $desktop_environment_version" # Replace "X-Cinnamon" with "Cinnamon" and add the version
+                ;;
+            "XFCE")
+                xfce_version=$(xfce4-session --version)
+                desktop_environment_version=$(echo "$xfce_version" | awk '{print $2}')
+                ;;
+            *)
+                desktop_environment_version="Not available"
+                ;;
+            esac
+
+            echo -e "${GREEN} \e[1mDE:${NC} $desktop_environment" # Add a version to the output
+            echo -e "${GREEN} \e[1mWM:${NC} $(wmctrl -m | grep "Name:" | cut -d ' ' -f2)"
+
+            # Getting information about the GTK design theme
+            if command -v gsettings &>/dev/null; then
+                echo -e "${GREEN} \e[1mWM Theme:${NC} $(gsettings get org.gnome.desktop.wm.preferences theme)"
+                echo -e "${GREEN} \e[1mTheme:${NC} $(gsettings get org.gnome.desktop.interface gtk-theme)"
+            elif [ -n "$GTK2_RC_FILES" ]; then
+                wm_theme=$(grep "gtk-theme-name" $GTK2_RC_FILES | cut -d '=' -f2)
+                echo -e "${GREEN} \e[1mWM Theme:${NC} $wm_theme"
+            else
+                echo -e "${GREEN} \e[1mWM Theme:${NC} Not available"
+            fi
+
+            # Getting information about icons
+            get_icons() {
+                # Search in the current theme for icons via gsettings
+                icons=$(gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null)
+
+                if [ $? -eq 0 ] && [ -n "$icons" ]; then
+                    echo -e "${GREEN} \e[1mIcons:${NC} $icons"
+                else
+                    echo -e "${GREEN} \e[1mIcons:${NC} Not available"
+                fi
+            }
+
+            # Function call
+            get_icons
+
+            # Getting information about the terminal
+            if [ "$XDG_SESSION_TYPE" == "x11" ]; then
+                terminal_name="X Terminal Emulator"
+            elif [ "$XDG_SESSION_TYPE" == "wayland" ]; then
+                terminal_name="Wayland Terminal"
+            else
+                # If it was not possible to determine by environment variables, use ps
+                terminal_name=$(ps -p $$ -o comm= | sed 's/^-//')
+            fi
+
+            echo -e "${GREEN} \e[1mTerminal:${NC} $terminal_name"
+
+            echo -e "${GREEN} \e[1mCPU:${NC} $(grep 'model name' /proc/cpuinfo | uniq | cut -d ':' -f 2 | xargs)"
+            echo -e "${GREEN} \e[1mGPU:${NC} $(lspci | grep -i 'VGA\|3D' | sed 's/^.*: //')"
+
+            echo -e "${GREEN} \e[1m-------------------${NC}"
+            echo -e "${GREEN} \e[1mPerformance Information:${NC}"
+            echo -e "${GREEN} \e[1mCPU Load:${NC}"
+            echo ""
+            echo -e "${GREEN} \e[1mTotal CPU Load:${NC}"
+            echo -e " All cores: $(mpstat | awk '$12 ~ /[0-9.]+/ {printf "%.2f%%\n", 100-$12}' | tail -n 1)"
+            echo ""
+            echo -e "${GREEN} \e[1mCPU Load per Core:${NC}"
+            i=0
+            grep -E 'cpu[0-9]+' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} {printf " Core %d: %.2f%%\n", i, usage; i++}'
+
+            echo ""
+            echo -e "${GREEN} \e[1mRAM:${NC}"
+            total_mem=$(awk '/MemTotal/ {printf "%.2f GB", $2/1024/1024}' /proc/meminfo)
+            free_mem=$(awk '/MemAvailable/ {printf "%.2f GB", $2/1024/1024}' /proc/meminfo)
+            used_mem=$(awk '/MemTotal/ {total=$2} /MemAvailable/ {available=$2} END {printf "%.2f GB", (total - available) / 1024 / 1024}' /proc/meminfo)
+            echo -e " Total: $total_mem"
+            echo -e " Used: $used_mem "
+            echo -e " Free: $free_mem"
+
+            echo ""
+            echo -e "${GREEN} \e[1mDisk Usage:${NC}"
+            df -h / | awk 'NR==2 {printf " Total: %s\n Used: %s\n Free: %s\n", $2, $3, $4}' | sed 's/G/ GB/g'
+            echo -e "${GREEN} \e[1m-------------------${NC}"
+        }
+
+        # Function call
+        get_system_info
+
+        # Prompt the user to return to the menu
+        echo ""
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
+
+        if [ "$input" == "q" ]; then
+            break # Exit the loop and return to the menu
+        fi
+    done
+}
+
+function mative_ucaresystem {
+    MATIVE_UCS_VERSION="0.0.1"
+    while true; do
+        clear  # Clear the screen
+        # Logo
+        print_logo
+
+        # Application information
+        echo ""
+        echo -e "${GREEN} \e[1mmative-ucaresystem${NC} all-in-one System Update and maintenance assistant app."
+        echo " An all-in-one, system maintenance application "
+        echo " for Ubuntu/Debian operating systems and derivatives" 
+        echo " "
+        echo ""
+        echo " mative-ucaresystem v$MATIVE_UCS_VERSION (c) Maksym Titenko"
+        echo " GitHub: https://github.com/titenko/mative-tweak"
+        echo " Discussions: https://github.com/titenko/mative-tweak/discussions"
+        echo " Issues: https://github.com/titenko/mative-tweak/issues"
+        echo ""
+        echo -e "${GREEN} \e[1mMative-uCareSystem:${NC}"
+        echo ""
+        echo " -------------------------------------------------------------------- "
+        echo " Welcome to all-in-one System Update and maintenance assistant app."
+        echo ""
+        echo " This simple script will automatically refresh your packagelist,"
+        echo " download and install updates (if there are any),"
+        echo " remove any old kernels,"
+        echo " obsolete packages and configuration files to free up disk space,"
+        echo " without any need of user interference"
+        echo " -------------------------------------------------------------------- "
+        echo ""
+        echo "You want to run Mative-uCareSystem? (Yes/No) " 
+        read -p "$prompt " input
+        case "$choice" in
+        y|Y|yes|Yes)
+        echo ""        
+        echo "Start..."
+        echo ""
+        sleep 2    
+        ;;
+        n|N|no|No)
+        echo ""
+        echo "Stop..."
+        sleep 2
+        break
+        ;;
+        *)
+        echo "Invalid choice, exiting."
+        break
+        ;;
+        esac
+    
+        echo "Updating package lists"
+        sleep 2
+        sudo apt update
+        echo ""
+        echo "Upgrading packages and system libraries"
+        echo ""
+        sleep 2
+        sudo apt upgrade -y
+        sudo apt full-upgrade -y
+        echo ""
+        echo "Removing unneeded packages"
+        echo ""
+        sleep 2
+        sudo apt autoremove --purge -y
+        # Remove old kernels
+        echo ""
+        echo "Removing old kernels"
+        echo ""
+        sleep 2
+        KEEP=2
+        APT_OPTS=
+        while [ ! -z "$1" ]; do
+        case "$1" in
+        --keep)
+        KEEP="$2"
+        shift 2
+        ;;
+        *)
+        APT_OPTS="$APT_OPTS $1"
+        shift 1
+        ;;
+        esac
+        done
+        # Build list of kernel packages to purge
+        CANDIDATES=$(ls -tr /boot/vmlinuz-* | head -n -${KEEP} | grep -v "$(uname -r)$" | cut -d- -f2- | awk '{print "linux-image-" $0 " linux-headers-" $0}' )
+        PURGE=""
+        for c in $CANDIDATES; do
+        dpkg-query -s "$c" >/dev/null 2>&1 && PURGE="$PURGE $c"
+        done
+
+        if [ -z "$PURGE" ]; then
+        echo ""
+        echo "No kernels are eligible for removal"
+        echo ""
+        else
+        sudo apt $APT_OPTS remove -y --purge $PURGE
+        fi
+
+
+        # Remove unused config files
+        echo ""
+        echo "Removing unused config files"
+        echo ""
+        sleep 2
+        sudo apt autoclean -y
+        sudo apt clean -y
+        echo ""
+        echo "Updating flatpak apps"
+        echo ""
+        sleep 2
+        flatpak update
+
+        echo ""        
+        echo "System upgrade - completed"        
+        echo ""
+        # Prompt the user to return to the menu
+        echo "Press 'q' to return to the menu:"
+        read -p "$prompt " input
+        if [ "$input" == "q" ]; then
+            break
+        fi
+    done
+}
+
 # Main menu
 while true; do
     clear # Clear the screen
+    # Logo
+    cat <<"EOF"
+  ____    ____       _     _________  _____  ____   ____  ________
+ |_   \  /   _|     / \   |  _   _  ||_   _||_  _| |_  _||_   __  |
+   |   \/   |      / _ \  |_/ | | \_|  | |    \ \   / /    | |_ \_|
+   | |\  /| |     / ___ \     | |      | |     \ \ / /     |  _| _
+  _| |_\/_| |_  _/ /   \ \_  _| |_    _| |_     \ ' /     _| |__/ |
+ |_____||_____||____| |____||_____|  |_____|     \_/     |________|
+EOF
     echo ""
-    echo "  ____    ____       _     _________  _____  ____   ____  ________  "
-    echo " |_   \  /   _|     / \   |  _   _  ||_   _||_  _| |_  _||_   __  | "
-    echo "   |   \/   |      / _ \  |_/ | | \_|  | |    \ \   / /    | |_ \_| "
-    echo "   | |\  /| |     / ___ \     | |      | |     \ \ / /     |  _| _  "
-    echo "  _| |_\/_| |_  _/ /   \ \_  _| |_    _| |_     \ ' /     _| |__/ | "
-    echo " |_____||_____||____| |____||_____|  |_____|     \_/     |________| "
-    echo ""
-    echo " mative-tweak - An all-in-one, system maintenance application "
+    echo -e "${GREEN} \e[1mmative-tweak${NC} An all-in-one, system maintenance application "
     echo " for Ubuntu/Debian operating systems and derivatives"
     echo ""
-    echo " Your operating system: $UBUNTU_VERSION"
-    echo " Your kernel release: $KERNEL_RELEASE"
-    echo " Your kernel version: $KERNEL_VERSION"
     echo ""
     echo " mative-tweak v$SCRIPT_VERSION (c) Maksym Titenko"
     echo " GitHub: https://github.com/titenko/mative-tweak"
@@ -1107,46 +1403,49 @@ while true; do
     echo " Issues: https://github.com/titenko/mative-tweak/issues"
     echo ""
     # Display the menu
-    echo " Menu:"
+    echo -e "${GREEN} \e[1mMenu:${NC}"
     echo ""
-    echo " --- Tweaks & Settings"
-    echo " 0.  Update & Upgrade System"
-    echo " 1.  Uninstall Snap and block future installation"
-    echo " 2.  Flatpak installation and configuration"
-    echo " 3.  Install the multimedia codec pack"
-    echo " 4.  Install additional support for archivers"
-    echo " 5.  Disable sudo password entry in terminal"
-    echo " 6.  Zram - Installing and configuring"
-    echo " --- Nvidia"
-    echo " 7.  Automatically installing Nvidia drivers - Version 1"
-    echo " 8.  Automatically installing Nvidia drivers - Version 2"
-    echo " 9.  Automatically installing Nouveau Nvidia drivers"
-    echo " --- Browsers"
-    echo " 10. Firefox - Install the deb version of the web browser from PPA"
-    echo " 11. Brave - Install the deb version of the web browser from official repository"
-    echo " 12. Chromium - Install the deb version of the web browser from PPA"
-    echo " 13. Google Chrome - Install the deb version of the web browser from official Google repository"
-    echo " --- Messengers"
-    echo " 14. Telegram Desktop - Install binary version from official web page"
-    echo " 15. Ferdium - Install the deb version from GitHub"
-    echo " 16. Discord - Install the deb version from official web page"
-    echo " --- Kernels"
-    echo " 17. Automatic installation of Xanmod kernel with CPU compatibility level detection"
-    echo " 18. Install Liquorix kernel from PPA"
-    echo " 19. Install Liquorix kernel using the developer script"
-    echo " 20. Install Ubuntu Mainline Kernel from PPA"
-    echo " 21. Install Ubuntu Mainline Kernel from SRC (Testing)"
-    echo " --- Apps"
-    echo " 22. VLC player - Installing and configuring"
-    echo " 23. Foliate - Installing and configuring"
-    echo " --- Themes & Icons"
-    echo " 24. Papirus Icons Pack - download and install"
-    echo " --- "
-    echo " a.  About"
-    echo " c.  Changelog"
-    echo " u.  Check update"
-    echo " r.  Reboot mative-tweak"
-    echo " e.  Exit"
+    echo -e "${GREEN} \e[1m---  Tweaks & Settings${NC}"
+    echo " 0.   Update & Upgrade System"
+    echo " 1.   Uninstall Snap and block future installation"
+    echo " 2.   Flatpak installation and configuration"
+    echo " 3.   Install the multimedia codec pack"
+    echo " 4.   Install additional support for archivers"
+    echo " 5.   Disable sudo password entry in terminal"
+    echo " 6.   Zram - Installing and configuring"
+    echo -e "${GREEN} \e[1m---  Nvidia${NC}"
+    echo " 7.   Automatically installing Nvidia drivers - Version 1"
+    echo " 8.   Automatically installing Nvidia drivers - Version 2"
+    echo " 9.   Automatically installing Nouveau Nvidia drivers"
+    echo -e "${GREEN} \e[1m---  Browsers${NC}"
+    echo " 10.  Firefox - Install the deb version of the web browser from PPA"
+    echo " 11.  Brave - Install the deb version of the web browser from official repository"
+    echo " 12.  Chromium - Install the deb version of the web browser from PPA"
+    echo " 13.  Google Chrome - Install the deb version of the web browser from official Google repository"
+    echo -e "${GREEN} \e[1m---  Messengers${NC}"
+    echo " 14.  Telegram Desktop - Install binary version from official web page"
+    echo " 15.  Ferdium - Install the deb version from GitHub"
+    echo " 16.  Discord - Install the deb version from official web page"
+    echo -e "${GREEN} \e[1m---  Kernels${NC}"
+    echo " 17.  Automatic installation of Xanmod kernel with CPU compatibility level detection"
+    echo " 18.  Install Liquorix kernel from PPA"
+    echo " 19.  Install Liquorix kernel using the developer script"
+    echo " 20.  Install Ubuntu Mainline Kernel from PPA"
+    echo " 21.  Install Ubuntu Mainline Kernel from SRC (Testing)"
+    echo -e "${GREEN} \e[1m---  Apps${NC}"
+    echo " 22.  VLC player - Installing and configuring"
+    echo " 23.  Foliate - Installing and configuring"
+    echo -e "${GREEN} \e[1m---  Themes & Icons${NC}"
+    echo " 24.  Papirus Icons Pack - download and install"
+    echo -e "${GREEN} \e[1m---  Mative Apps${NC}"
+    echo " f.   Mative-Fetch"
+    echo " ucs. Mative-uCareSystem"
+    echo -e "${GREEN} \e[1m---${NC}"
+    echo " a.   About"
+    echo " c.   Changelog"
+    echo " u.   Check update"
+    echo " r.   Reboot mative-tweak"
+    echo " e.   Exit"
 
     # Prompt the user to make a choice
     echo ""
@@ -1189,6 +1488,8 @@ while true; do
     24) papirus_installer ;;
     25) option22 ;;
     # ---
+    f) mative-fetch ;;
+    ucs) mative_ucaresystem ;;
     u) update_and_restart_script ;;
     a) about ;;
     c) changelog ;;
